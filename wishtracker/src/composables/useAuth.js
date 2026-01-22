@@ -4,7 +4,7 @@ const user = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export function useAuth() {
   const isAuthenticated = computed(() => user.value !== null)
@@ -23,8 +23,8 @@ export function useAuth() {
       if (response.ok) {
         const data = await response.json()
         console.log('Backend response:', data)
-        console.log('User name:', data.name)
-        user.value = data
+        user.value = data.user  // Extract the user object
+        console.log('User:', user.value)
       } else {
         user.value = null
       }
