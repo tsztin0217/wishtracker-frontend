@@ -2,7 +2,7 @@
   <div class="auth-container">
 
     <div v-if="isAuthenticated">
-      <p>Welcome, {{ user.user.name }}!</p>
+      <p>Welcome, {{ user.name }}!</p>
       <p>Debug: {{ user }}</p>
       <button @click="logout">Sign Out</button>
     </div>
