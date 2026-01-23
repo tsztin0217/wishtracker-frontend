@@ -14,8 +14,9 @@
     "start": "serve dist -s -l ${PORT:-8080}"
   },
   "dependencies": {
-    "vue": "^3.5.26",
-    "serve": "^14.2.4"
+    "@vueuse/core": "^14.1.0",
+    "serve": "^14.2.4",
+    "vue": "^3.5.26"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.3",

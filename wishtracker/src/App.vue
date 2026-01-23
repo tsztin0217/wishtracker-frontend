@@ -7,7 +7,7 @@ import ItemForm from './components/ItemForm.vue'
 const { isAuthenticated } = useAuth()
 const showForm = ref(false)
 const openForm = () => { showForm.value = true }
-const closeForm = () => { showForm.value = false }
+
 
 
 </script>
