@@ -13,7 +13,7 @@ const submitTag = () => {
 </script>
 
 <template>
-  <div class="tag-creator">
+  <div>
     <h3>Create New Tag</h3>
     <input v-model="newTagName" class="short-field" placeholder="e.g. Electronics" />
     <button @click="submitTag">Add Tag</button>
@@ -21,7 +21,6 @@ const submitTag = () => {
 </template>
 
 <style scoped>
-.tag-creator { border: 1px solid white; margin-top: 1rem; margin-bottom: 1rem; padding: 1rem; }
 .short-field {
   width: 20%;
 }

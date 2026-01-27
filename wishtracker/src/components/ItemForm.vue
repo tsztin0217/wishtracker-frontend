@@ -1,6 +1,8 @@
 <script setup>
 import { ref, shallowRef } from 'vue'
 import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
+import { uploadImage } from '@/composables/uploadImage'
+const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:5000';
 
 const header = ref('Add a Wish Item')
 const emit = defineEmits(['close'])
@@ -9,6 +11,8 @@ const selectedFile = shallowRef(null)
 const previewUrl = useObjectUrl(selectedFile)
 
 const { open, onChange } = useFileDialog({ accept: 'image/*', multiple: false })
+const isSaving = ref(false)
+
 
 onChange((files) => {
   if (files?.[0]) selectedFile.value = files[0]
@@ -39,6 +43,46 @@ const addTagInput = () => {
 const removeTag = (index) => {
   tags.value.splice(index, 1)
 }
+
+async function handleSubmit() {
+  if (!newName.value) return alert('Item Name is required');
+  
+  isSaving.value = true;
+  try {
+    let uploadedData = { public_url: '', gcs_path: '' };
+
+    if (selectedFile.value) {
+      uploadedData = await uploadImage(selectedFile.value);
+    }
+
+    const finalForm = {
+      name: newName.value,
+      website_url: newLink.value,
+      description: newDescription.value,
+      price: newPrice.value,
+      img_url: uploadedData.public_url,
+      gcs_path: uploadedData.gcs_path,
+      tags: tags.value.filter(t => t.trim() !== '')
+    };
+    
+    const saveRes = await fetch(`${API_BASE_URL}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalForm),
+      credentials: 'include'
+    });
+
+    if (!saveRes.ok) throw new Error('Database save failed');
+    
+    emit('close');
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+
 
 </script>
 
@@ -74,7 +118,6 @@ const removeTag = (index) => {
       <button type="button" @click="removeTag(index)">Delete</button>
     </div>
   </div>
-  <!-- ------------------------ -->
 
   <div 
     ref="dropZoneRef" 
@@ -92,7 +135,7 @@ const removeTag = (index) => {
     </div>
   </div>
 
-  <button type="submit">Submit</button>
+  <button type="submit" @click="handleSubmit">Submit</button>
   <button type="button" @click="cancel">Cancel</button>
 </template>
 
