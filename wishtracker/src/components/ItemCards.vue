@@ -1,19 +1,34 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:5000'
+const VITE_API_URL = import.meta.env.VITE_API_URL
 const items = ref([])
 async function fetchItems() {
-  const res = await fetch(`${API_BASE_URL}/items`, { credentials: 'include' })
+  const res = await fetch(`${VITE_API_URL}/items`, { credentials: 'include' })
   const data = await res.json()
   items.value = data.items
-  items.value.forEach(item => {
-  console.log('Raw:', item.created_at)
-  console.log('Parsed:', new Date(item.created_at))
-  console.log('Local:', new Date(item.created_at).toLocaleString())
-})
 }
 onMounted(fetchItems)
 
+async function deleteItem(itemId) {
+    if (!confirm('Are you sure you want to delete this item?')) return
+
+    try {
+        const res = await fetch(`${VITE_API_URL}/items/${itemId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+        if (res.ok) {
+            // remove from local list to trigger UI update
+            items.value = items.value.filter(item => item.id !== itemId)
+        } else {
+            alert('Failed to delete item')
+        }
+    } catch (error) {
+        console.error('Error:', error)
+    }
+}
+
+onMounted(fetchItems)
 
 </script>
 
@@ -25,6 +40,8 @@ onMounted(fetchItems)
       <p>{{ item.description }}</p>
       <p>Price: ${{ item.price }}</p>
       <p>Created at: {{ new Date(item.created_at).toLocaleString() }}</p>
+      <p>Tags: {{ item.tags.map(tag => tag.name).join(', ') }}</p>
+      <button class="delete-btn" @click="deleteItem(item.id)">×</button>
     </div>
   </div>
 </template>

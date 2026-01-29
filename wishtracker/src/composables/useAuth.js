@@ -4,7 +4,7 @@ const user = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
+const VITE_API_URL = import.meta.env.VITE_API_URL
 
 export function useAuth() {
   const isAuthenticated = computed(() => user.value !== null)
@@ -14,7 +14,7 @@ export function useAuth() {
     error.value = null
     
     try {
-      const response = await fetch(`${API_BASE_URL}/user`, {
+      const response = await fetch(`${VITE_API_URL}/user`, {
         method: 'GET',
         credentials: 'include', 
         headers: { 'Content-Type': 'application/json' }
@@ -38,14 +38,14 @@ export function useAuth() {
 
 
   const login = () => {
-    window.location.href = `${API_BASE_URL}/login`
+    window.location.href = `${VITE_API_URL}/login`
   }
 
 
   const logout = async () => {
     loading.value = true
     try {
-      const response = await fetch(`${API_BASE_URL}/logout`, {
+      const response = await fetch(`${VITE_API_URL}/logout`, {
         method: 'POST', 
         credentials: 'include'
       })

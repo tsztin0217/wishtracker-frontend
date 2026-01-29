@@ -1,9 +1,9 @@
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:5000';
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 export async function uploadImage(file) {
   if (!file) return { public_url: '', gcs_path: '' };
 
   // get signed upload URL from backend
-  const urlResponse = await fetch(`${API_BASE_URL}/api/images/upload-url`, {
+  const urlResponse = await fetch(`${VITE_API_URL}/api/images/upload-url`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 

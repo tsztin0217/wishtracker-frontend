@@ -1,27 +1,35 @@
 <script setup>
-import { ref } from 'vue'
-const emit = defineEmits(['tagCreated'])
+import { ref } from 'vue';
+import VueMultiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.css';
 
-const newTagName = ref('')
+const selectedTags = ref([]);
+const allAvailableTags = ref([
+  { id: 1, name: 'Vue' },
+  { id: 2, name: 'Python' }
+]);
 
-const submitTag = () => {
-    if(!newTagName.value) return;
-    const createdTag = { id: Date.now(), name: newTagName.value }
-    emit('tagCreated', createdTag)
-    newTagName.value = ''
-}
+
+const handleNewTag = (newTagName) => {
+  const newTag = {
+    name: newTagName
+  };
+  allAvailableTags.value.push(newTag);
+  selectedTags.value.push(newTag);
+};
 </script>
 
 <template>
   <div>
-    <h3>Create New Tag</h3>
-    <input v-model="newTagName" class="short-field" placeholder="e.g. Electronics" />
-    <button @click="submitTag">Add Tag</button>
+    <VueMultiselect
+      v-model="selectedTags"
+      :options="allAvailableTags"
+      :multiple="true"
+      :taggable="true"
+      label="name"
+      track-by="id"
+      placeholder="Search or add a tag"
+      @tag="handleNewTag"
+    />
   </div>
 </template>
-
-<style scoped>
-.short-field {
-  width: 20%;
-}
-</style>

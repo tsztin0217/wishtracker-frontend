@@ -2,7 +2,8 @@
 import { ref, shallowRef } from 'vue'
 import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
 import { uploadImage } from '@/composables/uploadImage'
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:5000';
+import AddTag from './AddTag.vue';
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const header = ref('Add a Wish Item')
 const emit = defineEmits(['close'])
@@ -36,13 +37,13 @@ const newPrice = ref('')
 
 const tags = ref([])
 
-const addTagInput = () => {
-  tags.value.push('') 
-}
+// const addTagInput = () => {
+//   tags.value.push('') 
+// }
 
-const removeTag = (index) => {
-  tags.value.splice(index, 1)
-}
+// const removeTag = (index) => {
+//   tags.value.splice(index, 1)
+// }
 
 async function handleSubmit() {
   if (!newName.value) return alert('Item Name is required');
@@ -55,17 +56,17 @@ async function handleSubmit() {
       uploadedData = await uploadImage(selectedFile.value);
     }
 
-    const finalForm = {
+      const finalForm = {
       name: newName.value,
       website_url: newLink.value,
       description: newDescription.value,
       price: newPrice.value,
       img_url: uploadedData.public_url,
       gcs_path: uploadedData.gcs_path,
-      tags: tags.value.filter(t => t.trim() !== '')
+        tags: tags.value.filter(t => t.trim() !== '')
     };
     
-    const saveRes = await fetch(`${API_BASE_URL}/items`, {
+    const saveRes = await fetch(`${VITE_API_URL}/items`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(finalForm),
@@ -106,17 +107,7 @@ async function handleSubmit() {
   </div>
   <div>
     <label>Tags:</label>
-    <button type="button" @click="addTagInput">+</button>
-    
-    <div v-for="(tag, index) in tags" :key="index" class="tag-row">
-      <input 
-        type="text" 
-        v-model="tags[index]" 
-        placeholder="Enter tag" 
-        class="short-field" 
-      />
-      <button type="button" @click="removeTag(index)">Delete</button>
-    </div>
+      <AddTag v-model="tags" />
   </div>
 
   <div 
@@ -156,6 +147,7 @@ async function handleSubmit() {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
+  width: 50%;
 }
 .is-active {
   border-color: #98fe84;
