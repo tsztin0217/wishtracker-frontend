@@ -37,14 +37,6 @@ const newPrice = ref('')
 
 const tags = ref([])
 
-// const addTagInput = () => {
-//   tags.value.push('') 
-// }
-
-// const removeTag = (index) => {
-//   tags.value.splice(index, 1)
-// }
-
 async function handleSubmit() {
   if (!newName.value) return alert('Item Name is required');
   
@@ -63,7 +55,7 @@ async function handleSubmit() {
       price: newPrice.value,
       img_url: uploadedData.public_url,
       gcs_path: uploadedData.gcs_path,
-        tags: tags.value.filter(t => t.trim() !== '')
+      tags: tags.value.map(t => typeof t === 'string' ? t : t.name)
     };
     
     const saveRes = await fetch(`${VITE_API_URL}/items`, {

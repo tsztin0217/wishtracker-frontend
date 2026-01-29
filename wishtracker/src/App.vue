@@ -9,7 +9,13 @@ import ItemCards from './components/ItemCards.vue'
 const { isAuthenticated } = useAuth()
 const showForm = ref(false)
 const openForm = () => { showForm.value = true }
+const itemCardsRef = ref(null)
 
+const handleClose = () => {
+  showForm.value = false
+  // call fetchItems if the component exists
+  itemCardsRef.value?.fetchItems() 
+}
 
 
 </script>
@@ -23,8 +29,8 @@ const openForm = () => { showForm.value = true }
       <button v-if="!showForm" @click="openForm">
         Add a Wish item
       </button>
-      <ItemForm v-if="showForm" @close="showForm = false" />
-      <ItemCards />
+      <ItemForm v-if="showForm" @close="handleClose" />
+      <ItemCards ref="itemCardsRef" />
     </div>
 
   </main>
