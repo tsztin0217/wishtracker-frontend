@@ -1,52 +1,92 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import MultiSelect from 'primevue/multiselect'
+
 const VITE_API_URL = import.meta.env.VITE_API_URL
+
 const items = ref([])
+const selectedTags = ref([])
+
 async function fetchItems() {
   const res = await fetch(`${VITE_API_URL}/items`, { credentials: 'include' })
   const data = await res.json()
   items.value = data.items
 }
-onMounted(fetchItems)
+
+const allTags = computed(() => {
+  const tagsMap = new Map()
+  items.value.forEach(item => {
+    item.tags.forEach(tag => tagsMap.set(tag.id, tag))
+  })
+  return Array.from(tagsMap.values())
+})
+
+const filteredItems = computed(() => {
+  if (selectedTags.value.length === 0) return items.value
+  
+  return items.value.filter(item => 
+  // Show item if it has ALL selected tags
+  selectedTags.value.every(filterTag => 
+  item.tags.some(itemTag => itemTag.id === filterTag.id)
+)
+)
+})
 
 async function deleteItem(itemId) {
-    if (!confirm('Are you sure you want to delete this item?')) return
-
-    try {
-        const res = await fetch(`${VITE_API_URL}/items/${itemId}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        })
-        if (res.ok) {
-            // remove from local list to trigger UI update
-            items.value = items.value.filter(item => item.id !== itemId)
-        } else {
-            alert('Failed to delete item')
-        }
-    } catch (error) {
-        console.error('Error:', error)
+  if (!confirm('Are you sure you want to delete this item?')) return
+  
+  try {
+    const res = await fetch(`${VITE_API_URL}/items/${itemId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+    if (res.ok) {
+      // remove from local list to trigger UI update
+      items.value = items.value.filter(item => item.id !== itemId)
+    } else {
+      alert('Failed to delete item')
     }
+  } catch (error) {
+    console.error('Error:', error)
+  }
 }
 
+// expose fetchItems to parent via template ref
+defineExpose({ fetchItems })
 onMounted(fetchItems)
+
 
 </script>
 
 <template>
+  <div class="controls">
+    <MultiSelect 
+      v-model="selectedTags" 
+      :options="allTags" 
+      optionLabel="name" 
+      placeholder="Filter by Tags" 
+      display="chip" 
+      class="filter-dropdown"
+    />
+  </div>
   <div class="item-list">
-    <div v-for="item in items" :key="item.id" class="item-card">
+    <div v-for="item in filteredItems" :key="item.id" class="item-card">
       <a :href="item.website_url" target="_blank"><img :src="item.img_url" alt="Item image" /></a>
       <h3 :title="item.name">{{ item.name }}</h3>
       <p>{{ item.description }}</p>
-      <p>Price: ${{ item.price }}</p>
+      <p>${{ item.price }}</p>
       <p>Created at: {{ new Date(item.created_at).toLocaleString() }}</p>
-      <p>Tags: {{ item.tags.map(tag => tag.name).join(', ') }}</p>
+      <p v-if="item.tags.length > 0">Tags: {{ item.tags.map(tag => tag.name).join(', ') }}</p>
       <button class="delete-btn" @click="deleteItem(item.id)">×</button>
     </div>
   </div>
 </template>
 
 <style scoped>
+.controls { margin-bottom: 20px; }
+
+.filter-dropdown { width: 100%; max-width: 400px; }
+
 .item-list {
   display: flex;
   flex-wrap: wrap;
@@ -70,6 +110,7 @@ onMounted(fetchItems)
 }
 
 .item-card h3 {
+  font-weight: bold;
   font-size: 1.1rem;
   margin: 0.5rem 0;
   white-space: nowrap;

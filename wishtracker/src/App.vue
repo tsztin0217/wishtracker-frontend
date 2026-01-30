@@ -17,6 +17,10 @@ const handleClose = () => {
   itemCardsRef.value?.fetchItems() 
 }
 
+const refreshData = () => {
+  itemCardsRef.value?.fetchItems();
+}
+
 
 </script>
 
@@ -29,7 +33,11 @@ const handleClose = () => {
       <button v-if="!showForm" @click="openForm">
         Add a Wish item
       </button>
-      <ItemForm v-if="showForm" @close="handleClose" />
+      <ItemForm 
+        v-if="showForm" 
+        @close="handleClose" 
+        @tagDeleted="refreshData" 
+      />
       <ItemCards ref="itemCardsRef" />
     </div>
 

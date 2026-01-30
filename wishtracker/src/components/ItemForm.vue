@@ -6,7 +6,7 @@ import AddTag from './AddTag.vue';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const header = ref('Add a Wish Item')
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'tagDeleted'])
 
 const selectedFile = shallowRef(null)
 const previewUrl = useObjectUrl(selectedFile)
@@ -91,7 +91,9 @@ async function handleSubmit() {
   </div>
   <div>
     <label for="newDescription">Description:</label>
-    <textarea id="newDescription" rows="4" v-model="newDescription"></textarea>
+    <textarea id="newDescription" rows="4" v-model="newDescription" maxlength="250"></textarea>
+    <small :class="{ 'text-danger': newDescription.length >= 250 }">
+    {{ newDescription.length }} / 250 characters </small>
   </div>
   <div>
     <label for="newPrice">Price:</label>
@@ -99,7 +101,7 @@ async function handleSubmit() {
   </div>
   <div>
     <label>Tags:</label>
-      <AddTag v-model="tags" />
+      <AddTag v-model="tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
   </div>
 
   <div 
@@ -161,5 +163,13 @@ async function handleSubmit() {
   display: flex;
   gap: 5px;
   align-items: center;
+}
+
+small {
+  display: block;
+  color: #7d7d7d;
+}
+.text-danger {
+  color: #ff4d4d;
 }
 </style>
