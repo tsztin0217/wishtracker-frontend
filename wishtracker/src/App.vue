@@ -47,9 +47,11 @@ const refreshData = () => {
 
 <style scoped>
 main {
+  align-items: center;
   padding: 2rem;
   width: 100vw;
-  max-width: 100vw;
   box-sizing: border-box;
+  /* border: 1px solid blue; */
+
 }
 </style>

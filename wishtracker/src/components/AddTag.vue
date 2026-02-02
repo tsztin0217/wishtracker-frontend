@@ -37,8 +37,14 @@ const onKeyUp = (event) => {
 };
 
 async function fetchTags() {
+  const storedId = localStorage.getItem('user_id');
     try {
-        const res = await fetch(`${VITE_API_URL}/tags`, { credentials: 'include' });
+        const res = await fetch(`${VITE_API_URL}/tags`, { 
+          credentials: 'include',
+          headers: {
+            'X-User-ID': storedId || ''
+          }
+        });
         if (res.ok) {
             const data = await res.json();
             allAvailableTags.value = data.tags; // uses tag_bp.get_all_tags logic
@@ -53,10 +59,15 @@ onMounted(fetchTags);
 const confirmPermanentDelete = async (tag) => {
   if (!confirm(`Permanently delete "${tag.name}"? This removes it from ALL items.`)) return;
 
+  const storedId = localStorage.getItem('user_id');
+
   try {
     const res = await fetch(`${VITE_API_URL}/tags/${tag.id}`, {
       method: 'DELETE',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'X-User-ID': storedId || ''
+      }
     });
 
     if (res.ok) {
@@ -76,7 +87,7 @@ const confirmPermanentDelete = async (tag) => {
 </script>
 
 <template>
-  <div class="card p-fluid">
+  <div class="card">
     <AutoComplete 
       v-model="selectedTags" 
       multiple 
@@ -113,12 +124,14 @@ const confirmPermanentDelete = async (tag) => {
 .flex {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+
+  
 }
 .justify-content-between {
   justify-content: space-between;
 }
-.w-full {
-  width: 100%;
-}
+
+
 </style>

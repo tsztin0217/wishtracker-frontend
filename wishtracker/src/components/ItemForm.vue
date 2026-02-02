@@ -39,6 +39,7 @@ const tags = ref([])
 
 async function handleSubmit() {
   if (!newName.value) return alert('Item Name is required');
+  const storedId = localStorage.getItem('user_id');
   
   isSaving.value = true;
   try {
@@ -60,7 +61,10 @@ async function handleSubmit() {
     
     const saveRes = await fetch(`${VITE_API_URL}/items`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-User-ID': storedId || ''
+      },
       body: JSON.stringify(finalForm),
       credentials: 'include'
     });

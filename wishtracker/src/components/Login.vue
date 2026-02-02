@@ -43,6 +43,8 @@ onMounted(() => {
   gap: 10px;
   padding: 10px 20px;
   cursor: pointer;
+  justify-content: center;
+  /* border: 1px solid white; */
 }
 .google-btn img { width: 20px; }
 .error { color: red; }

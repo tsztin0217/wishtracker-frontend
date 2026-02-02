@@ -1,11 +1,17 @@
 @import './base.css';
 
-#app {
-  max-width: 1280px;
+#app, html, body {
+  display: grid;
   margin: 0 auto;
-  padding: 2rem;
   font-weight: normal;
+  align-items: center;
+  max-width: 100%;
+  /* border: 1px solid rgb(255, 0, 162); */
+  justify-content: center;
+  width: 100%;
+
 }
+
 
 a,
 .green {
@@ -17,19 +23,16 @@ a,
 
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    filter: brightness(1.1)
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+body {
+  /* display: flex; */
+  justify-content: center; /* ADD THIS LINE to center #app horizontally */
+  /* align-items: flex-start; */
+  /* border: 1px solid orange; */
+  justify-content: flex-center;
+  display: flex;
+  margin: 0 auto;
 }

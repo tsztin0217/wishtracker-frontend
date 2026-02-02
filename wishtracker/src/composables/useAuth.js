@@ -12,12 +12,28 @@ export function useAuth() {
   const checkAuth = async () => {
     loading.value = true
     error.value = null
+
+     // 1. Snag user_id from URL if it's there (after login redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const userIdFromUrl = urlParams.get('user_id');
+    
+    if (userIdFromUrl) {
+      localStorage.setItem('user_id', userIdFromUrl);
+      // Clean the URL so the ID isn't hanging out in the address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    const storedId = localStorage.getItem('user_id');
     
     try {
       const response = await fetch(`${VITE_API_URL}/user`, {
         method: 'GET',
         credentials: 'include', 
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${localStorage.getItem('user_id')}`
+          'X-User-ID': storedId || '' 
+        }
       })
 
       if (response.ok) {
@@ -49,6 +65,8 @@ export function useAuth() {
         method: 'POST', 
         credentials: 'include'
       })
+      localStorage.removeItem('user_id');
+      user.value = null
       if (response.ok) user.value = null
     } catch (err) {
       error.value = "Logout failed"
