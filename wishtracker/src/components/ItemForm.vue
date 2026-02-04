@@ -1,12 +1,31 @@
 <script setup>
-import { ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
 import { uploadImage } from '@/composables/uploadImage'
+import { useLinkPreview } from '@/composables/useLinkPreview'
 import AddTag from './AddTag.vue';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-const header = ref('Add a Wish Item')
+// const header = ref('Add a Wish Item')
 const emit = defineEmits(['close', 'tagDeleted'])
+
+const model = defineModel(
+  { 
+    default: () => (
+      {
+        name: '',
+        website_url: '',
+        description: '',
+        price: '',
+        tags: [] 
+      }
+    ) 
+  }
+)
+
+const isEdit = computed(() => !!model.value?.id)
+
+const { isFetching, fetchedImageUrl, fetchLinkPreview: fetchPreview, clearFetchedImage } = useLinkPreview()
 
 const selectedFile = shallowRef(null)
 const previewUrl = useObjectUrl(selectedFile)
@@ -29,43 +48,54 @@ const { isOverDropZone } = useDropZone(dropZoneRef, { onDrop, dataTypes: ['image
 
 const cancel = () => emit('close')
 
-const newLink = ref('')
-const newName = ref('')
-const newDescription = ref('')
-const newPrice = ref('')
+async function fetchLinkPreview() {
+  const data = await fetchPreview(model.value.website_url)
+  if (data) {
+    // Autofill form fields (always overwrite)
+    if (data.title) model.value.name = data.title
+    if (data.description) model.value.description = data.description
+    if (data.image) model.value.img_url = data.image
+  }
+}
+
+// const newLink = ref('')
+// const newName = ref('')
+// const newDescription = ref('')
+// const newPrice = ref('')
 
 
-const tags = ref([])
+// const tags = ref([])
 
 async function handleSubmit() {
-  if (!newName.value) return alert('Item Name is required');
+  if (!model.value.name) return alert('Item Name is required');
   const storedId = localStorage.getItem('user_id');
   
   isSaving.value = true;
   try {
     let uploadedData = { public_url: '', gcs_path: '' };
 
-    if (selectedFile.value) {
+    // Only upload if user selected a file and no fetched image
+    if (selectedFile.value && !fetchedImageUrl.value) {
       uploadedData = await uploadImage(selectedFile.value);
     }
 
-      const finalForm = {
-      name: newName.value,
-      website_url: newLink.value,
-      description: newDescription.value,
-      price: newPrice.value,
-      img_url: uploadedData.public_url,
-      gcs_path: uploadedData.gcs_path,
-      tags: tags.value.map(t => typeof t === 'string' ? t : t.name)
+      const payload = {
+      ...model.value,
+      img_url: fetchedImageUrl.value || uploadedData.public_url,
+      gcs_path: fetchedImageUrl.value ? '' : uploadedData.gcs_path,
+      tags: (model.value.tags || []).map(t => typeof t === 'string' ? t : t.name)
     };
     
-    const saveRes = await fetch(`${VITE_API_URL}/items`, {
-      method: 'POST',
+    const url = isEdit.value ? `${VITE_API_URL}/items/${model.value.id}` : `${VITE_API_URL}/items`;
+    const method = isEdit.value ? 'PATCH' : 'POST';
+
+    const saveRes = await fetch(url, {
+      method,
       headers: { 
         'Content-Type': 'application/json',
         'X-User-ID': storedId || ''
       },
-      body: JSON.stringify(finalForm),
+      body: JSON.stringify(payload),
       credentials: 'include'
     });
 
@@ -84,47 +114,58 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <h1>{{ header }}</h1>
   <div>
-    <label for="newLink">Link:</label>
-    <input id="newLink" type="url" v-model="newLink" placeholder="https://example.com/product" class="long-field"/>
+    <label for="newLink">Link: </label>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <input id="newLink" type="url" required v-model="model.website_url" placeholder="https://example.com/product" class="long-field"/>
+      <button type="button" @click="fetchLinkPreview" :disabled="isFetching || !model.website_url" class="fetch-btn">
+        {{ isFetching ? 'Fetching...' : 'Fetch' }}
+      </button>
+    </div>
   </div>
   <div>
-    <label for="newName">Item Name:</label>
-    <input id="newName" type="text" required v-model="newName" />
+    <label for="newName">Item Name: </label>
+    <input id="newName" type="text" required v-model="model.name" />
   </div>
   <div>
-    <label for="newDescription">Description:</label>
-    <textarea id="newDescription" rows="4" v-model="newDescription" maxlength="250"></textarea>
-    <small :class="{ 'text-danger': newDescription.length >= 250 }">
-    {{ newDescription.length }} / 250 characters </small>
+    <label for="newDescription">Description: </label>
+    <textarea id="newDescription" rows="4" v-model="model.description" maxlength="250"></textarea>
+    <small :class="{ 'text-danger': model.description?.length >= 250 }">
+    {{ model.description?.length || 0 }} / 250 characters </small>
   </div>
   <div>
-    <label for="newPrice">Price:</label>
-    <input id="newPrice" type="number" min="0" v-model="newPrice"/>
+    <label for="newPrice">Price: </label>
+    <input id="newPrice" type="number" min="0" v-model="model.price"/>
   </div>
   <div>
     <label>Tags:</label>
-      <AddTag v-model="tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
+      <AddTag v-model="model.tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
   </div>
 
-  <div 
-    ref="dropZoneRef" 
-    class="drop-zone" 
-    :class="{ 'is-active': isOverDropZone }"
-  >
-    <div v-if="previewUrl" class="preview-wrap">
-      <img :src="previewUrl" class="preview-img" alt="Preview" />
-      <button type="button" @click="selectedFile = null">Remove Image</button>
+  <!-- hide image upload if editing -->
+  <div v-if="!isEdit">
+    <div v-if="fetchedImageUrl" class="preview-wrap">
+      <img :src="fetchedImageUrl" class="preview-img" alt="Preview" />
+      <button type="button" @click="clearFetchedImage(); model.img_url = ''">Remove Image</button>
     </div>
-    <div v-else>
-      <p v-if="!isOverDropZone">Drag and drop a product image here</p>
-      <p v-else>Release to upload</p>
-      <button type="button" @click="open">Or Select Files</button>
+    <div v-else
+      ref="dropZoneRef" 
+      class="drop-zone" 
+      :class="{ 'is-active': isOverDropZone }"
+    >
+      <div v-if="previewUrl" class="preview-wrap">
+        <img :src="previewUrl" class="preview-img" alt="Preview" />
+        <button type="button" @click="selectedFile = null">Remove Image</button>
+      </div>
+      <div v-else>
+        <p v-if="!isOverDropZone">Drag and drop a product image here</p>
+        <p v-else>Release to upload</p>
+        <button type="button" @click="open">Or Select Files</button>
+      </div>
     </div>
   </div>
 
-  <button type="submit" @click="handleSubmit">Submit</button>
+  <button type="submit" @click="handleSubmit">{{ isEdit ? 'Save' : 'Submit' }}</button>
   <button type="button" @click="cancel">Cancel</button>
 </template>
 
@@ -175,5 +216,8 @@ small {
 }
 .text-danger {
   color: #ff4d4d;
+}
+div {
+  margin-top: 10px;
 }
 </style>

@@ -1,15 +1,27 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import Dialog from 'primevue/dialog' 
+import NavBar from './components/NavBar.vue'
 import Login from './components/Login.vue'
 import ItemForm from './components/ItemForm.vue'
 import StarCursor from './components/StarCursor.vue'
 import ItemCards from './components/ItemCards.vue'
 
-const { isAuthenticated } = useAuth()
+const { isAuthenticated, checkAuth } = useAuth()
 const showForm = ref(false)
-const openForm = () => { showForm.value = true }
+const openForm = (item = null) => {
+  selectedItem.value = item ? { ...item } : { 
+    name: '', 
+    website_url: '',
+    description: '',
+    price: '',
+    tags: [] 
+  };
+  showForm.value = true;
+};
 const itemCardsRef = ref(null)
+const selectedItem = ref(null)
 
 const handleClose = () => {
   showForm.value = false
@@ -21,24 +33,31 @@ const refreshData = () => {
   itemCardsRef.value?.fetchItems();
 }
 
+onMounted(() => {
+  checkAuth()
+})
 
 </script>
 
-
 <template>
   <StarCursor />
+  <NavBar />
   <main>
-    <Login />
+    <!-- <Login /> -->
     <div v-if="isAuthenticated">
-      <button v-if="!showForm" @click="openForm">
-        Add a Wish item
-      </button>
-      <ItemForm 
-        v-if="showForm" 
-        @close="handleClose" 
-        @tagDeleted="refreshData" 
-      />
-      <ItemCards ref="itemCardsRef" />
+      <button @click="openForm">Add a Wish item</button>
+      <Dialog 
+        v-model:visible="showForm" 
+        modal
+        dismissable-mask
+        :header="selectedItem && selectedItem.id ? 'Edit Wish Item' : 'Add a Wish Item'" 
+        :style="{ width: '50vw' }"
+        :breakpoints="{ '960px': '75vw', '641px': '100vw' }"
+      >
+        <ItemForm v-model="selectedItem" @close="handleClose" @tagDeleted="refreshData" />
+      </Dialog>
+
+      <ItemCards ref="itemCardsRef" @edit-item="openForm" />
     </div>
 
   </main>

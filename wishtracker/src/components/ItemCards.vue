@@ -19,6 +19,15 @@ const openDetails = (item) => {
   isDetailVisible.value = true
 }
 
+const getDomain = (url) => {
+  if (!url) return ''
+  try {
+    return new URL(url).hostname.replace('www.', '')
+  } catch (e) {
+    return url
+  }
+}
+
 async function fetchItems() {
   const storedId = localStorage.getItem('user_id');
   try {
@@ -159,12 +168,58 @@ onMounted(fetchItems)
 
   <Dialog
     v-model:visible="isDetailVisible"
-    :header="selectedItemForDetail?.name"
-    :model="true"
+    
+    modal
+    dismissableMask
     :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
-    style="width: 50vw"
+    style="width: 70vw;"
   >
-  
+    <div v-if="selectedItemForDetail" class="detail-container">
+      <div class="detail-left">
+        <div class="detail-image">
+          <img v-if="selectedItemForDetail.img_url" :src="selectedItemForDetail.img_url" alt="Item image"/>
+          <i v-else class="pi pi-image placeholder-icon"></i>
+        </div>
+        <div v-if="selectedItemForDetail.website_url" class="website-link">
+          <a :href="selectedItemForDetail.website_url" target="_blank" rel="noopener noreferrer">
+            {{ getDomain(selectedItemForDetail.website_url) }}
+            <i class="pi pi-external-link"></i>
+          </a>
+        </div>
+      </div>
+      <div class="detail-content">
+        <h4>{{ selectedItemForDetail.name }}</h4>
+        <p>{{ selectedItemForDetail.description }}</p>
+        <p class="price-row">
+          <i class="pi pi-dollar price-icon"></i>
+          {{ selectedItemForDetail.price }}
+        </p>
+        <div class="detail-bottom">
+          <div v-if="selectedItemForDetail.tags && selectedItemForDetail.tags.length > 0" class="tag-row">
+            <i class="pi pi-tags meta-icon" v-tooltip="'Tags'"></i>
+            <div class="tag-list">
+              <Tag 
+                v-for="tag in selectedItemForDetail.tags" 
+                :key="tag.id" 
+                :value="tag.name" 
+                severity="secondary" 
+                class="custom-tag"
+              />
+            </div>
+          </div>
+          <div class="detail-dates">
+            <div class="date-row">
+                <i class="pi pi-calendar date-icon"></i>
+                Created: {{ new Date(selectedItemForDetail.created_at).toLocaleDateString() }}
+            </div>
+            <div v-if="selectedItemForDetail.last_updated" class="date-row">
+                <i class="pi pi-clock date-icon"></i>
+                Updated: {{ new Date(selectedItemForDetail.last_updated).toLocaleDateString() }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </Dialog>
 </template>
 
@@ -213,6 +268,10 @@ onMounted(fetchItems)
   font-size: 0.9rem;
 }
 
+.detail-content .date-row {
+  justify-content: flex-start;
+  align-items: baseline;
+}
 .item-card {
   position: relative;
   /* width: 100%; */
@@ -298,16 +357,26 @@ onMounted(fetchItems)
   margin-top: 10px;
   margin-bottom: 2px;
   margin-inline: auto;
+  overflow: hidden;
   /* margin: 0 auto 1px auto; */
 }
 
 .tag-row {
   display: flex;
-
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-top: 2px;
+}
+
+/* Tags in item cards - centered */
+.item-card .tag-row {
+  justify-content: center;
+}
+
+/* Tags in detail dialog - left-aligned */
+.detail-content .tag-row {
+  justify-content: flex-start;
 }
 
 .tag-list {
@@ -327,5 +396,118 @@ onMounted(fetchItems)
 .custom-tag {
   font-size: 0.9rem;
 }
-</style>
 
+.detail-container {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.detail-left {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-self: center;
+}
+
+.detail-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.detail-image img {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.detail-image .placeholder-icon {
+  font-size: 10rem;
+  color: #ddd;
+}
+
+.detail-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 400px;
+}
+
+.detail-content h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.detail-content p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.detail-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-content .date-row {
+  justify-content: flex-start;
+  font-size: 0.8rem;
+  color: #999999;
+}
+
+.item-list i {
+  font-size: 0.8rem;
+}
+
+
+.website-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  /* background-color: rgba(102, 126, 234, 0.1); */
+  border-radius: 6px;
+  word-break: break-all;
+  justify-content: center;
+}
+
+.website-link i {
+  color: #667eea;
+  font-size: 0.7rem;
+}
+
+.website-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.website-link a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .detail-container {
+    flex-direction: column;
+  }
+  
+  .detail-left {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+</style>
