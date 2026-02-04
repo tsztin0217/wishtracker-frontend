@@ -3,12 +3,21 @@ import { ref, onMounted, computed } from 'vue'
 import MultiSelect from 'primevue/multiselect'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import Dialog from 'primevue/dialog' 
+
 
 const VITE_API_URL = import.meta.env.VITE_API_URL
 
 const items = ref([])
 const selectedTags = ref([])
 const emit = defineEmits(['edit-item'])
+const isDetailVisible = ref(false)
+const selectedItemForDetail = ref(null)
+
+const openDetails = (item) => {
+  selectedItemForDetail.value = item
+  isDetailVisible.value = true
+}
 
 async function fetchItems() {
   const storedId = localStorage.getItem('user_id');
@@ -112,10 +121,10 @@ onMounted(fetchItems)
           class="edit-btn" 
           @click="emit('edit-item', item)" 
         />
-        <a :href="item.website_url" target="_blank" class="image-wrapper">
+        <div class="image-wrapper" @click="openDetails(item)" style="cursor: pointer;">
           <img v-if="item.img_url" :src="item.img_url" alt="Item image"/>
           <i v-else class="pi pi-image placeholder-icon"></i>
-        </a>
+        </div>
         <h3 :title="item.name">{{ item.name }}</h3>
         <p :title="item.description">{{ item.description }}</p>
         <span>
@@ -147,6 +156,16 @@ onMounted(fetchItems)
       </div>
     </div>
   </div>
+
+  <Dialog
+    v-model:visible="isDetailVisible"
+    :header="selectedItemForDetail?.name"
+    :model="true"
+    :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+    style="width: 50vw"
+  >
+  
+  </Dialog>
 </template>
 
 <style scoped>
@@ -264,9 +283,9 @@ onMounted(fetchItems)
 
 .item-card:hover {
   box-shadow: 
-    0 0 10px #c6dff2,
-    0 0 20px #84d9fe,
-    0 0 40px rgba(13, 117, 228, 0.4);
+    0 0 10px #e5c6f2,
+    0 0 20px #c984fe,
+    0 0 40px rgba(138, 49, 227, 0.4);
 }
 
 .image-wrapper {
