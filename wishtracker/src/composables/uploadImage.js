@@ -1,11 +1,14 @@
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 export async function uploadImage(file) {
   if (!file) return { public_url: '', gcs_path: '' };
+  const storedId = localStorage.getItem('user_id');
 
   // get signed upload URL from backend
   const urlResponse = await fetch(`${VITE_API_URL}/api/images/upload-url`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-User-ID': storedId || ''},
     body: JSON.stringify({ 
       filename: file.name, 
       content_type: file.type 
