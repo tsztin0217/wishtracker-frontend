@@ -3,7 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import MultiSelect from 'primevue/multiselect'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
-import Dialog from 'primevue/dialog' 
+import Dialog from 'primevue/dialog'
+import Menu from 'primevue/menu'
 
 
 const VITE_API_URL = import.meta.env.VITE_API_URL
@@ -13,11 +14,31 @@ const selectedTags = ref([])
 const emit = defineEmits(['edit-item'])
 const isDetailVisible = ref(false)
 const selectedItemForDetail = ref(null)
+const menuRefs = ref({})
+const menu = ref()
 
 const openDetails = (item) => {
   selectedItemForDetail.value = item
   isDetailVisible.value = true
 }
+
+const toggleMenu = (event, itemId) => {
+  event.stopPropagation()
+  menuRefs.value[itemId].toggle(event)
+}
+
+const getMenuItems = (item) => [
+  {
+    label: 'Edit',
+    icon: 'pi pi-pencil',
+    command: () => emit('edit-item', item)
+  },
+  {
+    label: 'Delete',
+    icon: 'pi pi-trash',
+    command: () => deleteItem(item.id)
+  }
+]
 
 const getDomain = (url) => {
   if (!url) return ''
@@ -113,24 +134,18 @@ onMounted(fetchItems)
     </div>
 
     <div class="item-list">
-      <div v-for="item in filteredItems" :key="item.id" class="item-card">
+      <div v-for="item in filteredItems" :key="item.id" class="item-card" @click="openDetails(item)" style="cursor: pointer;">
         <Button 
-          icon="pi pi-times" 
-          severity="danger" 
+          icon="pi pi-ellipsis-v" 
+          class="menu-btn" 
+          text 
           rounded 
-          text 
-          class="delete-btn" 
-          @click="deleteItem(item.id)" 
+          @click="toggleMenu($event, item.id)"
+          v-tooltip="'Actions'"
         />
-        <Button 
-          icon="pi pi-pencil" 
-          severity="secondary" 
-          rounded
-          text 
-          class="edit-btn" 
-          @click="emit('edit-item', item)" 
-        />
-        <div class="image-wrapper" @click="openDetails(item)" style="cursor: pointer;">
+        <Menu :ref="el => { if (el) menuRefs[item.id] = el }" :model="getMenuItems(item)" :popup="true" />
+        
+        <div class="image-wrapper">
           <img v-if="item.img_url" :src="item.img_url" alt="Item image"/>
           <i v-else class="pi pi-image placeholder-icon"></i>
         </div>
@@ -168,7 +183,7 @@ onMounted(fetchItems)
 
   <Dialog
     v-model:visible="isDetailVisible"
-    
+    :header="selectedItemForDetail?.name"
     modal
     dismissableMask
     :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
@@ -188,7 +203,6 @@ onMounted(fetchItems)
         </div>
       </div>
       <div class="detail-content">
-        <h4>{{ selectedItemForDetail.name }}</h4>
         <p>{{ selectedItemForDetail.description }}</p>
         <p class="price-row">
           <i class="pi pi-dollar price-icon"></i>
@@ -285,6 +299,14 @@ onMounted(fetchItems)
   margin: 0 auto;
 }
 
+.menu-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+  color: #999;
+}
+
 .item-card img {
   /* position: absolute; */
   top: 25px;
@@ -316,30 +338,6 @@ onMounted(fetchItems)
   line-height: 1.1;
 }
 
-.item-card .delete-btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 2rem;
-  height: 2rem;
-  opacity: 0.4;
-  transition: opacity 0.2s;
-}
-
-.item-card .edit-btn {
-  position: absolute;
-  top: 4px;
-  left: 10px;
-  width: 2rem;
-  height: 2rem;
-  opacity: 0.4;
-  transition: opacity 0.2s;
-}
-
-.delete-btn:hover {
-  opacity: 1;
-}
-
 .item-card:hover {
   box-shadow: 
     0 0 10px #e5c6f2,
@@ -358,6 +356,7 @@ onMounted(fetchItems)
   margin-bottom: 2px;
   margin-inline: auto;
   overflow: hidden;
+  border-radius: 8px;
   /* margin: 0 auto 1px auto; */
 }
 
@@ -498,6 +497,23 @@ onMounted(fetchItems)
 .website-link a:hover {
   color: #764ba2;
   text-decoration: underline;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 @media (max-width: 768px) {
