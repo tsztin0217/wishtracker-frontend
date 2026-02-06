@@ -13,9 +13,15 @@ const filteredTags = ref([]);
 const searchTags = (event) => {
     const query = event.query.toLowerCase();
 
-    filteredTags.value = allAvailableTags.value.filter(t => 
-        t.name.toLowerCase().includes(query)
-    );
+    // get names of already selected tags in lowercase for comparison
+    const selectedNames = (selectedTags.value || []).map(t => t.name.toLowerCase());
+
+    // filter all available tags by the query AND exclude already selected ones
+    filteredTags.value = allAvailableTags.value.filter(t => {
+        const matchesQuery = t.name.toLowerCase().includes(query);
+        const isNotSelected = !selectedNames.includes(t.name.toLowerCase());
+        return matchesQuery && isNotSelected;
+    });
 };
 
 // logic to handle adding a new tag when user presses Enter
@@ -32,6 +38,7 @@ const onKeyUp = (event) => {
             selectedTags.value.push(newTag);
             
             event.target.value = '';
+            event.preventDefault();
         }
     }
 };

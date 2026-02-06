@@ -58,8 +58,7 @@ function handleLogin() {
 }
 
 .navbar-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;

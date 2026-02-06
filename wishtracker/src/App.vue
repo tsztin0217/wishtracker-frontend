@@ -45,7 +45,7 @@ onMounted(() => {
   <main>
     <!-- <Login /> -->
     <div v-if="isAuthenticated">
-      <button @click="openForm">Add a Wish item</button>
+      <ItemCards ref="itemCardsRef" @edit-item="openForm" @add-item="openForm" />
       <Dialog 
         v-model:visible="showForm" 
         modal
@@ -56,8 +56,6 @@ onMounted(() => {
       >
         <ItemForm v-model="selectedItem" @close="handleClose" @tagDeleted="refreshData" />
       </Dialog>
-
-      <ItemCards ref="itemCardsRef" @edit-item="openForm" />
     </div>
 
   </main>

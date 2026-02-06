@@ -6,6 +6,9 @@ import { useLinkPreview } from '@/composables/useLinkPreview'
 import AddTag from './AddTag.vue';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
+const nameError = ref('')
+const nameInputRef = ref(null)
+
 // const header = ref('Add a Wish Item')
 const emit = defineEmits(['close', 'tagDeleted'])
 
@@ -25,7 +28,7 @@ const model = defineModel(
 
 const isEdit = computed(() => !!model.value?.id)
 
-const { isFetching, fetchedImageUrl, fetchLinkPreview: fetchPreview, clearFetchedImage } = useLinkPreview()
+const { isFetching, fetchedImageUrl, error: linkPreviewError, fetchLinkPreview: fetchPreview, clearFetchedImage } = useLinkPreview()
 
 const selectedFile = shallowRef(null)
 const previewUrl = useObjectUrl(selectedFile)
@@ -67,7 +70,16 @@ async function fetchLinkPreview() {
 // const tags = ref([])
 
 async function handleSubmit() {
-  if (!model.value.name) return alert('Item Name is required');
+  if (!model.value.name || model.value.name.trim() === '') {
+    nameError.value = 'Item name is required';
+
+    if (nameInputRef.value) {
+      nameInputRef.value.focus();
+      nameInputRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  nameError.value = '';
   const storedId = localStorage.getItem('user_id');
   
   isSaving.value = true;
@@ -81,6 +93,7 @@ async function handleSubmit() {
 
       const payload = {
       ...model.value,
+      price: model.value.price === "" ? null : model.value.price,
       img_url: fetchedImageUrl.value || uploadedData.public_url,
       gcs_path: fetchedImageUrl.value ? '' : uploadedData.gcs_path,
       tags: (model.value.tags || []).map(t => typeof t === 'string' ? t : t.name)
@@ -114,110 +127,217 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div>
-    <label for="newLink">Link: </label>
-    <div style="display: flex; gap: 0.5rem; align-items: center;">
-      <input id="newLink" type="url" required v-model="model.website_url" placeholder="https://example.com/product" class="long-field"/>
-      <button type="button" @click="fetchLinkPreview" :disabled="isFetching || !model.website_url" class="fetch-btn">
-        {{ isFetching ? 'Fetching...' : 'Fetch' }}
+  <form @submit.prevent class="details-form">
+    <div class="form-row">
+      <label for="newLink">Website</label>
+      <div>
+        <div class="input-group">
+          <input id="newLink" type="url" v-model="model.website_url" placeholder="https://..." />
+          <button type="button" @click="fetchLinkPreview" :disabled="isFetching || !model.website_url" class="fetch-btn">
+            {{ isFetching ? 'Fetching...' : 'Fetch' }}
+          </button>
+        </div>
+        <div v-if="linkPreviewError" class="error-message">{{ linkPreviewError }}</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="newName">Item Name*</label>
+      <div>
+        <input
+          ref="nameInputRef"
+          id="newName" 
+          type="text" required 
+          v-model="model.name" 
+          :class="{ 'input-error': nameError }"
+          @input="nameError = ''"
+          placeholder="Name of item" 
+        >
+        <div v-if="nameError" class="error-message">{{ nameError }}</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="newPrice">Price</label>
+      <input id="newPrice" type="number" min="0" v-model="model.price" placeholder="0.00" />
+    </div>
+
+    <div class="form-row vertical">
+      <label for="newDescription">Description</label>
+      <textarea id="newDescription" rows="3" v-model="model.description" maxlength="500"></textarea>
+      <div class="char-count" :class="{ 'text-danger': model.description?.length >= 500 }">
+        {{ model.description?.length || 0 }}/500
+      </div>
+    </div>
+
+    <div class="form-row vertical">
+      <label>Tags</label>
+      <AddTag v-model="model.tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
+    </div>
+
+    <div v-if="!isEdit" class="image-section">
+      <label>Product Image</label>
+      <div v-if="fetchedImageUrl || previewUrl" class="preview-card">
+        <img :src="fetchedImageUrl || previewUrl" alt="Preview" />
+        <button type="button" @click="clearFetchedImage(); selectedFile = null" class="remove-img-btn">×</button>
+      </div>
+      
+      <div v-else ref="dropZoneRef" class="drop-zone" :class="{ 'is-active': isOverDropZone }" @click="open">
+        <span>{{ isOverDropZone ? 'Release to upload' : 'Drag image or click to upload' }}</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" @click="cancel" class="btn-secondary">Cancel</button>
+      <button type="button" @click="handleSubmit" :disabled="isSaving" class="btn-primary">
+        {{ isSaving ? 'Saving...' : (isEdit ? 'Update Item' : 'Create Item') }}
       </button>
     </div>
-  </div>
-  <div>
-    <label for="newName">Item Name: </label>
-    <input id="newName" type="text" required v-model="model.name" />
-  </div>
-  <div>
-    <label for="newDescription">Description: </label>
-    <textarea id="newDescription" rows="4" v-model="model.description" maxlength="250"></textarea>
-    <small :class="{ 'text-danger': model.description?.length >= 250 }">
-    {{ model.description?.length || 0 }} / 250 characters </small>
-  </div>
-  <div>
-    <label for="newPrice">Price: </label>
-    <input id="newPrice" type="number" min="0" v-model="model.price"/>
-  </div>
-  <div>
-    <label>Tags:</label>
-      <AddTag v-model="model.tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
-  </div>
-
-  <!-- hide image upload if editing -->
-  <div v-if="!isEdit">
-    <div v-if="fetchedImageUrl" class="preview-wrap">
-      <img :src="fetchedImageUrl" class="preview-img" alt="Preview" />
-      <button type="button" @click="clearFetchedImage(); model.img_url = ''">Remove Image</button>
-    </div>
-    <div v-else
-      ref="dropZoneRef" 
-      class="drop-zone" 
-      :class="{ 'is-active': isOverDropZone }"
-    >
-      <div v-if="previewUrl" class="preview-wrap">
-        <img :src="previewUrl" class="preview-img" alt="Preview" />
-        <button type="button" @click="selectedFile = null">Remove Image</button>
-      </div>
-      <div v-else>
-        <p v-if="!isOverDropZone">Drag and drop a product image here</p>
-        <p v-else>Release to upload</p>
-        <button type="button" @click="open">Or Select Files</button>
-      </div>
-    </div>
-  </div>
-
-  <button type="submit" @click="handleSubmit">{{ isEdit ? 'Save' : 'Submit' }}</button>
-  <button type="button" @click="cancel">Cancel</button>
+  </form>
 </template>
 
 <style scoped>
-.short-field {
-  width: 15%;
-}
-.long-field {
-  width: 50%;
-}
-.drop-zone {
-  border: 2px dashed #ffffff;
-  padding: 20px;
-  text-align: center;
-  transition: 0.3s;
-  min-height: 150px;
+.details-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  width: 50%;
-}
-.is-active {
-  border-color: #98fe84;
-  background-color: rgba(162, 222, 195, 0.1);
-}
-.preview-img {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 4px;
-  display: block;
-  margin: 0 auto 10px;
-}
-.preview-wrap {
+  flex-direction: column;
+  gap: 1.25rem;
   width: 100%;
 }
 
-.tag-row {
-  margin-top: 5px;
-  display: flex;
-  gap: 5px;
+.form-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
   align-items: center;
+  gap: 1rem;
 }
 
-small {
-  display: block;
-  color: #7d7d7d;
+.form-row.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
-.text-danger {
-  color: #ff4d4d;
+
+label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-div {
-  margin-top: 10px;
+
+input, textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: white;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-color: #98fe84;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fetch-btn {
+  padding: 0 0.5rem;
+  background: #333;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.char-count {
+  align-self: flex-end;
+  font-size: 0.7rem;
+  color: #666;
+}
+
+/* Image Styling */
+.preview-card {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.preview-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.drop-zone {
+  border: 2px dashed #333;
+  border-radius: 8px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #beadff;
+  font-size: 0.8rem;
+}
+
+.is-active { border-color: #98fe84; color: #98fe84; }
+
+.input-error {
+  border-color: #ff4444 !important;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  background: #bf84fe;
+  color: black;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #b468e7;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #888;
+  border: none;
+  cursor: pointer;
 }
 </style>
