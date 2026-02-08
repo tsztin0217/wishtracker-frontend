@@ -14,7 +14,9 @@ app.use(PrimeVue, {
         preset: Aura,
         options: {
             prefix: 'p',
-            darkModeSelector: 'system', // or '.my-app-dark'
+            // use a class-based selector so we can
+            // control dark mode manually via useTheme
+            darkModeSelector: '.app-dark',
             cssLayer: false
         }
     }

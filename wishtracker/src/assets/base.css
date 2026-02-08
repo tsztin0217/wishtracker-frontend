@@ -33,21 +33,73 @@
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
 
+  --app-bg-color: #f5f7ff;
+  --app-bg-image: radial-gradient(circle at top, rgba(129, 140, 248, 0.35), transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #e5e7eb 100%);
+  --app-card-bg: #ffffff;
+
+  --form-field-bg: #ffffff;
+  --form-field-border: #d4d4d8;
+  --form-field-text: #020617;
+  --form-field-focus: #6366f1;
+  --form-muted-text: #6b7280;
+
+  --add-btn-bg: #8684fe;
+  --add-btn-text: #020617;
+
+  --card-glow-soft: rgba(129, 140, 248, 0.3);
+  --card-glow-strong: rgba(196, 181, 253, 0.65);
+  --card-glow-outer: rgba(129, 140, 248, 0.45);
+
+  --tag-icon-color: #4b5563;
+
+  --navbar-bg: linear-gradient(135deg, #e0e7ff 0%, #c4b5fd 100%);
+  --navbar-shadow: 0 2px 8px rgba(148, 163, 184, 0.35);
+  --navbar-text: #0f172a;
+  --navbar-chip-bg: rgba(15, 23, 42, 0.06);
+  --navbar-chip-text: #0f172a;
+
   --section-gap: 160px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
+:root.dark {
+  --color-background: var(--vt-c-black);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
 
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
 
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
+  --color-heading: var(--vt-c-text-dark-1);
+  --color-text: var(--vt-c-text-dark-2);
+
+  --app-bg-color: #020617;
+  --app-bg-image: radial-gradient(circle at top, rgba(56, 189, 248, 0.35), transparent 55%),
+    linear-gradient(180deg, #020617 0%, #000000 100%);
+  --app-card-bg: rgba(15, 23, 42, 0.96);
+
+  --form-field-bg: #020617;
+  --form-field-border: #334155;
+  --form-field-text: #e5e7eb;
+  --form-field-focus: #38bdf8;
+  --form-muted-text: #9ca3af;
+
+  --add-btn-bg: #4f46e5;
+  --add-btn-text: #f9fafb;
+
+  --card-glow-soft: rgba(56, 189, 248, 0.45);
+  --card-glow-strong: rgba(129, 140, 248, 0.85);
+  --card-glow-outer: rgba(59, 130, 246, 0.75);
+
+  --tag-icon-color: #b4dae9;
+
+  --navbar-bg: linear-gradient(135deg, #1d2546 0%, #4b2b63 100%);
+  --navbar-shadow: 0 2px 12px rgba(15, 23, 42, 0.9);
+  --navbar-text: #e5e7eb;
+  --navbar-chip-bg: rgba(15, 23, 42, 0.4);
+  --navbar-chip-text: #f9fafb;
+
+  --section-gap: 160px;
 }
 
 *,
@@ -61,10 +113,15 @@
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
+  background-color: var(--app-bg-color);
+  background-image: var(--app-bg-image);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
   transition:
     color 0.5s,
-    background-color 0.5s;
+    background-color 0.5s,
+    background-image 0.5s;
   line-height: 1.6;
   font-family:
     Inter,

@@ -221,7 +221,7 @@ async function handleSubmit() {
 label {
   font-weight: 600;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--form-muted-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -229,15 +229,16 @@ label {
 input, textarea {
   width: 100%;
   padding: 0.6rem;
-  border: 1px solid #333;
+  border: 1px solid var(--form-field-border);
   border-radius: 6px;
-  background: #1a1a1a;
-  color: white;
+  background: var(--form-field-bg);
+  color: var(--form-field-text);
   outline: none;
 }
 
 input:focus, textarea:focus {
-  border-color: #98fe84;
+  border-color: var(--form-field-focus);
+  box-shadow: 0 0 0 1px var(--form-field-focus);
 }
 
 .input-group {
@@ -246,18 +247,27 @@ input:focus, textarea:focus {
 }
 
 .fetch-btn {
-  padding: 0 0.5rem;
-  background: #333;
+  padding: 0 1rem;
+  min-width: 96px;
+  background-color: var(--add-btn-bg);
+  color: var(--add-btn-text);
   border: none;
-  border-radius: 4px;
-  color: white;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  transition: all 0.3s ease;
+  background-size: cover;
+  background-position: center;
 }
 
 .char-count {
   align-self: flex-end;
   font-size: 0.7rem;
-  color: #666;
+  color: var(--form-muted-text);
 }
 
 /* Image Styling */
@@ -267,7 +277,7 @@ input:focus, textarea:focus {
   height: 120px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #333;
+  border: 1px solid var(--form-field-border);
 }
 
 .preview-card img {
@@ -290,18 +300,20 @@ input:focus, textarea:focus {
 }
 
 .drop-zone {
-  border: 2px dashed #333;
+  border: 2px dashed var(--form-field-border);
   border-radius: 8px;
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #beadff;
+  color: var(--form-muted-text);
   font-size: 0.8rem;
 }
-
-.is-active { border-color: #98fe84; color: #98fe84; }
+.is-active {
+  border-color: var(--form-field-focus);
+  color: var(--form-field-focus);
+}
 
 .input-error {
   border-color: #ff4444 !important;
@@ -321,17 +333,16 @@ input:focus, textarea:focus {
 }
 
 .btn-primary {
-  background: #bf84fe;
-  color: black;
-  padding: 0.6rem 1.2rem;
+  background-color: var(--add-btn-bg);
+  color: var(--add-btn-text);
+  padding: 0.6rem 1.4rem;
   border-radius: 6px;
   font-weight: bold;
   border: none;
   cursor: pointer;
-}
-
-.btn-primary:hover {
-  background: #b468e7;
+  transition: all 0.3s ease;
+  background-size: cover;
+  background-position: center;
 }
 
 .btn-secondary {
@@ -339,5 +350,17 @@ input:focus, textarea:focus {
   color: #888;
   border: none;
   cursor: pointer;
+}
+
+.fetch-btn:hover,
+.btn-primary:hover {
+	background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2h5YmJsbHpkZTR1MGV6ZWxveWU4dWV0aHh3dnhlNmxtdXJwMW1iaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0HEiQoSPsfkity/giphy.gif');
+	color: white;
+	box-shadow: 0 4px 15px rgba(132, 154, 254, 0.4);
+}
+
+:root.dark .fetch-btn:hover,
+:root.dark .btn-primary:hover {
+	background-image: url('https://media1.tenor.com/m/r47ZgZUPwEwAAAAC/4th-of-july-night.gif');
 }
 </style>

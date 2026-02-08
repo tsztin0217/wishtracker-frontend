@@ -3,14 +3,16 @@ import { ref } from 'vue'
 export function useLinkPreview() {
   const isFetching = ref(false)
   const fetchedImageUrl = ref(null)
+  const error = ref(null)
   const VITE_API_URL = import.meta.env.VITE_API_URL
 
   async function fetchLinkPreview(url) {
     if (!url) {
-      alert('Please enter a URL first')
+      error.value = 'Please enter a URL first'
       return null
     }
     
+    error.value = null
     isFetching.value = true
     try {
       const res = await fetch(`${VITE_API_URL}/linkpreview/fetch`, {
@@ -20,7 +22,11 @@ export function useLinkPreview() {
         credentials: 'include'
       })
       
-      if (!res.ok) throw new Error('Failed to fetch link preview')
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({})); 
+        error.value = 'This website could not be autofilled by LinkPreview'
+        return null
+      }
       
       const data = await res.json()
       console.log('LinkPreview response:', data)
@@ -33,7 +39,7 @@ export function useLinkPreview() {
       
     } catch (err) {
       console.error('LinkPreview error:', err)
-      alert(`Error: ${err.message}`)
+      error.value = 'This website could not be autofilled by LinkPreview'
       return null
     } finally {
       isFetching.value = false
@@ -47,6 +53,7 @@ export function useLinkPreview() {
   return {
     isFetching,
     fetchedImageUrl,
+    error,
     fetchLinkPreview,
     clearFetchedImage
   }

@@ -7,6 +7,7 @@ import Login from './components/Login.vue'
 import ItemForm from './components/ItemForm.vue'
 import StarCursor from './components/StarCursor.vue'
 import ItemCards from './components/ItemCards.vue'
+import AppFooter from './components/AppFooter.vue'
 
 const { isAuthenticated, checkAuth } = useAuth()
 const showForm = ref(false)
@@ -59,12 +60,13 @@ onMounted(() => {
     </div>
 
   </main>
+  <AppFooter />
 </template>
 
 
 <style scoped>
 main {
-  align-items: center;
+  flex: 1 0 auto;
   padding: 2rem;
   width: 100vw;
   box-sizing: border-box;

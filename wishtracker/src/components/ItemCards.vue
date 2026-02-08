@@ -307,9 +307,9 @@ onMounted(fetchItems)
   gap: 8px;
   height: 40px;
   padding: 0 1.5rem;
-  
-  background-color: #8684fe;
-  color: black;
+
+  background-color: var(--add-btn-bg);
+  color: var(--add-btn-text);
   border: none;
   border-radius: 6px;
   font-weight: bold;
@@ -321,13 +321,17 @@ onMounted(fetchItems)
 }
 
 .custom-add-btn:hover {
-  background-image: url('https://media1.tenor.com/m/r47ZgZUPwEwAAAAC/4th-of-july-night.gif');
+  background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2h5YmJsbHpkZTR1MGV6ZWxveWU4dWV0aHh3dnhlNmxtdXJwMW1iaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0HEiQoSPsfkity/giphy.gif');
   color: white;
   box-shadow: 0 4px 15px rgba(132, 154, 254, 0.4);
 }
 
 .custom-add-btn:hover i {
   color: white;
+}
+
+:root.dark .custom-add-btn:hover {
+  background-image: url('https://media1.tenor.com/m/r47ZgZUPwEwAAAAC/4th-of-july-night.gif');
 }
 
 .item-list-wrapper {
@@ -451,10 +455,10 @@ onMounted(fetchItems)
 }
 
 .item-card:hover {
-  box-shadow: 
-    0 0 10px #e5c6f2,
-    0 0 20px #c984fe,
-    0 0 40px rgba(138, 49, 227, 0.4);
+  box-shadow:
+    0 0 10px var(--card-glow-soft),
+    0 0 20px var(--card-glow-strong),
+    0 0 40px var(--card-glow-outer);
 }
 
 .image-wrapper {
@@ -526,7 +530,7 @@ onMounted(fetchItems)
 .meta-icon {
   display: flex;
   font-size: 0.9rem;
-  color: #b4dae9;
+  color: var(--tag-icon-color);
   align-items: center;
   margin-top: 4px;
 }
