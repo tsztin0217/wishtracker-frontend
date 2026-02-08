@@ -46,6 +46,7 @@
 
   --add-btn-bg: #8684fe;
   --add-btn-text: #020617;
+  --edit-btn-text: #748bf0c9;
 
   --card-glow-soft: rgba(129, 140, 248, 0.3);
   --card-glow-strong: rgba(196, 181, 253, 0.65);
@@ -86,6 +87,7 @@
 
   --add-btn-bg: #4f46e5;
   --add-btn-text: #f9fafb;
+  --edit-btn-text: #f9fafbc9;
 
   --card-glow-soft: rgba(56, 189, 248, 0.45);
   --card-glow-strong: rgba(129, 140, 248, 0.85);

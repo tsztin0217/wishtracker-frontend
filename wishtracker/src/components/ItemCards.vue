@@ -26,6 +26,11 @@ const openDetails = (item) => {
   isDetailVisible.value = true
 }
 
+const editFromDetail = () => {
+  emit('edit-item', selectedItemForDetail.value)
+  isDetailVisible.value = false // close dialog after clicking edit
+}
+
 const toggleMenu = (event, itemId) => {
   event.stopPropagation()
   menuRefs.value[itemId].toggle(event)
@@ -238,6 +243,16 @@ onMounted(fetchItems)
             <i class="pi pi-external-link"></i>
           </a>
         </div>
+
+      <Button 
+        icon="pi pi-pencil" 
+        label="Edit"
+        text
+        rounded 
+        class="detail-edit-btn"
+        @click="editFromDetail" 
+        v-tooltip.top="'Edit Item'"
+      />
       </div>
       <div class="detail-content">
         <p>{{ selectedItemForDetail.description }}</p>
@@ -300,7 +315,7 @@ onMounted(fetchItems)
 	gap: 0.4rem;
 }
 
-.custom-add-btn {
+.custom-add-btn{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -320,17 +335,37 @@ onMounted(fetchItems)
   background-position: center;
 }
 
-.custom-add-btn:hover {
+.detail-edit-btn {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 1.5rem;
+
+  /* background-color: var(--add-btn-bg); */
+  color: var(--edit-btn-text);
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  
+  transition: all 0.3s ease;
+  background-size: cover;
+  background-position: center;
+}
+.custom-add-btn:hover, .detail-edit-btn.p-button:hover {
   background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2h5YmJsbHpkZTR1MGV6ZWxveWU4dWV0aHh3dnhlNmxtdXJwMW1iaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0HEiQoSPsfkity/giphy.gif');
   color: white;
   box-shadow: 0 4px 15px rgba(132, 154, 254, 0.4);
 }
 
-.custom-add-btn:hover i {
+.custom-add-btn:hover i, .detail-edit-btn.p-button:hover i {
   color: white;
 }
 
-:root.dark .custom-add-btn:hover {
+:root.dark .custom-add-btn:hover, :root.dark .detail-edit-btn.p-button:hover {
   background-image: url('https://media1.tenor.com/m/r47ZgZUPwEwAAAAC/4th-of-july-night.gif');
 }
 
