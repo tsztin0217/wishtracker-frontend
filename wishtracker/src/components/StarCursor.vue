@@ -8,14 +8,16 @@ import { onMounted, onUnmounted } from 'vue';
 
 const handleMouseMove = (e) => {
   const arr = [1, 0.9, 0.8, 0.5, 0.2];
+  const { clientX, clientY } = e;
+
   arr.forEach((i) => {
     const x = (1 - i) * 75;
     const star = document.createElement('div');
     star.className = 'star';
-    star.style.top = `${e.pageY + Math.round(Math.random() * x - x / 2)}px`;
-    star.style.left = `${e.pageX + Math.round(Math.random() * x - x / 2)}px`;
+    star.style.top = `${clientY + Math.round(Math.random() * x - x / 2)}px`;
+    star.style.left = `${clientX + Math.round(Math.random() * x - x / 2)}px`;
     document.body.appendChild(star);
-    
+
     setTimeout(() => {
       if (star.parentNode) document.body.removeChild(star);
     }, Math.round(Math.random() * i * 600));
@@ -33,7 +35,7 @@ onUnmounted(() => {
 
 <style>
 .star {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
   z-index: 9999;
 }
@@ -45,10 +47,10 @@ onUnmounted(() => {
 }
 .star:before {
   color: transparent;
-  text-shadow: 0 0 3px rgb(206, 239, 255);
+  text-shadow: 0 0 3px var(--star-glow-color);
 }
 .star:after {
-  background: rgb(246, 255, 252);
+  background: var(--star-fill-color);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

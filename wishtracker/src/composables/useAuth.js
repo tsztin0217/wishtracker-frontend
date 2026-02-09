@@ -38,9 +38,9 @@ export function useAuth() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('Backend response:', data)
+        // console.log('Backend response:', data)
         user.value = data.user  // Extract the user object
-        console.log('User:', user.value)
+        // console.log('User:', user.value)
       } else {
         user.value = null
       }

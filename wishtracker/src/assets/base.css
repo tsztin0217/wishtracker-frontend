@@ -23,6 +23,8 @@
 
 /* semantic color variables for this project */
 :root {
+  --button-gradient: linear-gradient(135deg, #c3cae9 50%, #6480d5 100%);
+  --navbar-background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmtwczE0NW1xajBoNnlha3A1cm92ZXM1NTFxN3ltYjI1bnFxYm1uMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/26BRyql7J3iOx875u/giphy.gif') ;
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
@@ -56,7 +58,11 @@
 
   --tag-icon-color: #4b5563;
 
-  --navbar-bg: linear-gradient(135deg, #e0e7ff 0%, #c4b5fd 100%);
+  /* Star cursor colors (light theme) */
+  --star-glow-color: rgb(191, 184, 249);
+  --star-fill-color: rgb(166, 174, 244);
+
+  --navbar-bg: linear-gradient(135deg, #c3cae9 50%, #6480d5 100%);
   --navbar-shadow: 0 2px 8px rgba(148, 163, 184, 0.35);
   --navbar-text: #0f172a;
   --navbar-chip-bg: rgba(15, 23, 42, 0.06);
@@ -66,6 +72,9 @@
 }
 
 :root.dark {
+  --button-gradient: linear-gradient(135deg, #131a3a 50%, #6175b3 100%);
+  --navbar-background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhmZjlseXR0eHQ3enM0emV2eWI5ZHkweGFrdGZ1YnRxanByY3dhaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/NzSUEgbTWB7TW/giphy.gif') ;
+
   --color-background: var(--vt-c-black);
   --color-background-soft: var(--vt-c-black-soft);
   --color-background-mute: var(--vt-c-black-mute);
@@ -98,7 +107,11 @@
 
   --tag-icon-color: #b4dae9;
 
-  --navbar-bg: linear-gradient(135deg, #1d2546 0%, #4b2b63 100%);
+  /* Star cursor colors (dark theme) */
+  --star-glow-color: rgba(129, 212, 250, 0.9);
+  --star-fill-color: rgba(224, 242, 254, 0.95);
+
+  --navbar-bg: linear-gradient(135deg, #131a3a 50%, #6175b3 100%);
   --navbar-shadow: 0 2px 12px rgba(15, 23, 42, 0.9);
   --navbar-text: #e5e7eb;
   --navbar-chip-bg: rgba(15, 23, 42, 0.4);

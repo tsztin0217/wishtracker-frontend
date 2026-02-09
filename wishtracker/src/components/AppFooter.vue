@@ -16,19 +16,18 @@ const year = new Date().getFullYear()
 .app-footer {
   width: 100%;
   padding: 0.75rem 1.5rem;
-  margin-top: 2rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  border-top: 1px solid rgba(172, 185, 238, 0.692);
   display: flex;
   justify-content: center;
 }
 
 .footer-content {
-  width: 100%;
-  max-width: 1200px;
+  /* width: 100%;
+  max-width: 1200px; */
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 0.8rem;
-  color: var(--form-muted-text);
+  color: var(--edit-btn-text);
 }
 </style>

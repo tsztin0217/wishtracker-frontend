@@ -8,6 +8,7 @@ import ItemForm from './components/ItemForm.vue'
 import StarCursor from './components/StarCursor.vue'
 import ItemCards from './components/ItemCards.vue'
 import AppFooter from './components/AppFooter.vue'
+import WelcomePage from './components/WelcomePage.vue'
 
 const { isAuthenticated, checkAuth } = useAuth()
 const showForm = ref(false)
@@ -58,6 +59,9 @@ onMounted(() => {
         <ItemForm v-model="selectedItem" @close="handleClose" @tagDeleted="refreshData" />
       </Dialog>
     </div>
+    <div v-else>
+      <WelcomePage />
+    </div>
 
   </main>
   <AppFooter />
@@ -69,7 +73,7 @@ main {
   flex: 1 0 auto;
   padding: 2rem;
   width: 100vw;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   /* border: 1px solid blue; */
 
 }

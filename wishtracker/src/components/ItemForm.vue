@@ -51,6 +51,17 @@ const { isOverDropZone } = useDropZone(dropZoneRef, { onDrop, dataTypes: ['image
 
 const cancel = () => emit('close')
 
+function clearImage() {
+  clearFetchedImage()
+  selectedFile.value = null
+  if (model.value) {
+    model.value.img_url = ''
+    if ('gcs_path' in model.value) {
+      model.value.gcs_path = ''
+    }
+  }
+}
+
 async function fetchLinkPreview() {
   const data = await fetchPreview(model.value.website_url)
   if (data) {
@@ -91,11 +102,22 @@ async function handleSubmit() {
       uploadedData = await uploadImage(selectedFile.value);
     }
 
-      const payload = {
+    let finalImgUrl = model.value.img_url || ''
+    let finalGcsPath = model.value.gcs_path || ''
+
+    if (fetchedImageUrl.value) {
+      finalImgUrl = fetchedImageUrl.value
+      finalGcsPath = ''
+    } else if (uploadedData.public_url) {
+      finalImgUrl = uploadedData.public_url
+      finalGcsPath = uploadedData.gcs_path
+    }
+
+    const payload = {
       ...model.value,
       price: model.value.price === "" ? null : model.value.price,
-      img_url: fetchedImageUrl.value || uploadedData.public_url,
-      gcs_path: fetchedImageUrl.value ? '' : uploadedData.gcs_path,
+      img_url: finalImgUrl,
+      gcs_path: finalGcsPath,
       tags: (model.value.tags || []).map(t => typeof t === 'string' ? t : t.name)
     };
     
@@ -175,11 +197,11 @@ async function handleSubmit() {
       <AddTag v-model="model.tags" @tagDeleted="(id) => $emit('tagDeleted', id)" />
     </div>
 
-    <div v-if="!isEdit" class="image-section">
+    <div class="image-section">
       <label>Product Image</label>
-      <div v-if="fetchedImageUrl || previewUrl" class="preview-card">
-        <img :src="fetchedImageUrl || previewUrl" alt="Preview" />
-        <button type="button" @click="clearFetchedImage(); selectedFile = null" class="remove-img-btn">×</button>
+      <div v-if="fetchedImageUrl || previewUrl || model.img_url" class="preview-card">
+        <img :src="fetchedImageUrl || previewUrl || model.img_url" alt="Preview" />
+        <button type="button" @click="clearImage" class="remove-img-btn">×</button>
       </div>
       
       <div v-else ref="dropZoneRef" class="drop-zone" :class="{ 'is-active': isOverDropZone }" @click="open">
@@ -249,7 +271,7 @@ input:focus, textarea:focus {
 .fetch-btn {
   padding: 0 1rem;
   min-width: 96px;
-  background-color: var(--add-btn-bg);
+  background-image: var(--button-gradient);
   color: var(--add-btn-text);
   border: none;
   border-radius: 6px;
@@ -333,7 +355,7 @@ input:focus, textarea:focus {
 }
 
 .btn-primary {
-  background-color: var(--add-btn-bg);
+  background-image: var(--button-gradient);
   color: var(--add-btn-text);
   padding: 0.6rem 1.4rem;
   border-radius: 6px;

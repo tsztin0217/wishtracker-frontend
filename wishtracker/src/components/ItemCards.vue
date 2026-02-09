@@ -14,6 +14,7 @@ const VITE_API_URL = import.meta.env.VITE_API_URL
 
 const items = ref([])
 const selectedTags = ref([])
+const selectedDomains = ref([])
 const emit = defineEmits(['edit-item', 'tagDeleted', 'add-item'])
 const isDetailVisible = ref(false)
 const selectedItemForDetail = ref(null)
@@ -88,6 +89,17 @@ const allTags = computed(() => {
   return Array.from(tagsMap.values())
 })
 
+const allDomains = computed(() => {
+  const domains = new Set()
+  items.value?.forEach(item => {
+    if (item.website_url) {
+      const domain = getDomain(item.website_url)
+      if (domain) domains.add(domain)
+    }
+  })
+  return Array.from(domains)
+})
+
 const filteredItems = computed(() => {
   let result = [...items.value]
 
@@ -100,7 +112,7 @@ const filteredItems = computed(() => {
     )
   }
 
-  // fag filter
+  // tag filter
   if (selectedTags.value.length > 0) {
     result = result.filter(item => 
       selectedTags.value.every(filterTag => 
@@ -108,7 +120,15 @@ const filteredItems = computed(() => {
       )
     )
   }
-
+  
+  // domain filter
+  if (selectedDomains.value.length > 0) {
+    result = result.filter(item => {
+      const domain = getDomain(item.website_url)
+      return domain && selectedDomains.value.includes(domain)
+    })
+  }
+  
   return result
 })
 
@@ -159,6 +179,13 @@ onMounted(fetchItems)
         display="chip" 
         class="filter-dropdown"
         placeholder="Filter by Tags"
+      />
+      <MultiSelect 
+        v-model="selectedDomains" 
+        :options="allDomains" 
+        display="chip" 
+        class="filter-dropdown"
+        placeholder="Filter by Domain"
       />
       <IconField iconPosition="left" class="search-bar">
       <InputIcon class="pi pi-search" />
@@ -250,8 +277,7 @@ onMounted(fetchItems)
         text
         rounded 
         class="detail-edit-btn"
-        @click="editFromDetail" 
-        v-tooltip.top="'Edit Item'"
+        @click="editFromDetail"
       />
       </div>
       <div class="detail-content">
@@ -297,7 +323,7 @@ onMounted(fetchItems)
 }
 
 .card-domain a {
-  color: #8fa1f1;
+  color: #7b90ee;
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.3s;
@@ -323,7 +349,7 @@ onMounted(fetchItems)
   height: 40px;
   padding: 0 1.5rem;
 
-  background-color: var(--add-btn-bg);
+  background-image: var(--button-gradient);
   color: var(--add-btn-text);
   border: none;
   border-radius: 6px;
@@ -344,7 +370,7 @@ onMounted(fetchItems)
   height: 40px;
   padding: 0 1.5rem;
 
-  /* background-color: var(--add-btn-bg); */
+  background-image: var(--button-gradient);
   color: var(--edit-btn-text);
   border: none;
   border-radius: 6px;
@@ -380,7 +406,7 @@ onMounted(fetchItems)
   gap: 0.75rem;
   justify-content: center;
 	align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .custom-add-btn {
@@ -395,9 +421,9 @@ onMounted(fetchItems)
   min-height: 3em;
 }
 
-.search-bar {
-  flex: 2;
-  min-width: 0;
+ .search-bar {
+  flex: 0 1 180px;
+  min-width: 140px;
   width: auto;
 }
 
@@ -425,6 +451,13 @@ onMounted(fetchItems)
   justify-content: center;
 
   font-size: 0.9rem;
+}
+
+.detail-content .price-row {
+  font: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .detail-content .date-row {
@@ -716,6 +749,24 @@ onMounted(fetchItems)
 @media (max-width: 600px) {
   .btn-text {
     display: none;
+  }
+
+  /* On small screens, make the search look icon-only */
+  .search-bar {
+	  flex: 0 0 2.5rem;
+	  min-width: 2.5rem;
+  }
+
+  .search-bar :deep(.p-inputtext) {
+	  width: 2.5rem;
+	  padding: 0;
+	  border: none;
+	  background: transparent;
+	  color: transparent;
+  }
+
+  .search-bar :deep(.p-inputtext::placeholder) {
+	  color: transparent;
   }
 
 }

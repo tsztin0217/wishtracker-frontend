@@ -61,7 +61,7 @@ function handleLogin() {
 
 <style scoped>
 .navbar {
-  background: var(--navbar-bg);
+  background: var(--navbar-background-image), var(--navbar-bg);
   box-shadow: var(--navbar-shadow);
   position: sticky;
   top: 0;
@@ -87,8 +87,8 @@ function handleLogin() {
 }
 
 .navbar-logo {
-  height: 32px;
-  width: auto;
+  height: 45px;
+
 }
 
 .navbar-menu {
