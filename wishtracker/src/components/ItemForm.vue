@@ -254,7 +254,7 @@ input:focus, textarea:focus {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
+  /* font-weight: 600; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,7 +337,6 @@ input:focus, textarea:focus {
   color: var(--add-btn-text);
   padding: 0.6rem 1.4rem;
   border-radius: 6px;
-  font-weight: bold;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -347,20 +346,20 @@ input:focus, textarea:focus {
 
 .btn-secondary {
   background: transparent;
-  color: #888;
+  color: #9b9b9b;
   border: none;
   cursor: pointer;
 }
 
+.btn-secondary:hover {
+  color: var(--add-btn-hover-text);
+}
+
 .fetch-btn:hover,
 .btn-primary:hover {
-	background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2h5YmJsbHpkZTR1MGV6ZWxveWU4dWV0aHh3dnhlNmxtdXJwMW1iaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0HEiQoSPsfkity/giphy.gif');
-	color: white;
+	background-image: var(--btn-background-hover-image);
+	color: var(--add-btn-hover-text);
 	box-shadow: 0 4px 15px rgba(132, 154, 254, 0.4);
 }
 
-:root.dark .fetch-btn:hover,
-:root.dark .btn-primary:hover {
-	background-image: url('https://media1.tenor.com/m/r47ZgZUPwEwAAAAC/4th-of-july-night.gif');
-}
 </style>
