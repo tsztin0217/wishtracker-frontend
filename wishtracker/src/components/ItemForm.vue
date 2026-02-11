@@ -366,6 +366,12 @@ input:focus, textarea:focus {
   background-position: center;
 }
 
+:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
 .btn-secondary {
   background: transparent;
   color: #9b9b9b;
@@ -377,8 +383,8 @@ input:focus, textarea:focus {
   color: var(--add-btn-hover-text);
 }
 
-.fetch-btn:hover,
-.btn-primary:hover {
+.fetch-btn:not(:disabled):hover,
+.btn-primary:not(:disabled):hover {
 	background-image: var(--btn-background-hover-image);
 	color: var(--add-btn-hover-text);
 	box-shadow: 0 4px 15px rgba(132, 154, 254, 0.4);
