@@ -53,7 +53,14 @@ const getMenuItems = (item) => [
 const getDomain = (url) => {
   if (!url) return ''
   try {
-    return new URL(url).hostname.replace('www.', '')
+    const hostname = new URL(url).hostname.replace('www.', '')
+    const parts = hostname.split('.')
+  
+    // we take only the last two (steampowered.com)
+    if (parts.length > 2) {
+      return parts.slice(-2).join('.')
+    }
+    return hostname
   } catch (e) {
     return url
   }
@@ -531,6 +538,7 @@ onMounted(fetchItems)
   align-items: center;
   height: 100px;
   width: 100px;
+  margin-top: 25px;
   border-radius: 2px;
 	margin-top: 6px;
 	margin-bottom: 6px;
@@ -542,6 +550,9 @@ onMounted(fetchItems)
 
 .image-wrapper img {
   transition: filter 0.3s ease;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 .image-wrapper img:hover {
