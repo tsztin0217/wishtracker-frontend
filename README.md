@@ -19,12 +19,11 @@ Access the live application at: [https://wishtracker-frontend-284687348047.us-ce
 
 
 ## Screenshots
-![lightmode-welcome-page](src/assets/screenshot-lightmode-welcome.png)
-![darkmode-welcome-page](src/assets/screenshot-darkmode-welcome.png)
-![item-form](src/assets/screenshot-item-form.png)
-![item-detail](src/assets/screenshot-item-detail.png)
-![dashboard](src/assets/screenshot-dashboard.png)
-
+![lightmode-welcome-page](wishtracker/src/assets/screenshot-lightmode-welcome.png)
+![darkmode-welcome-page](wishtracker/src/assets/screenshot-darkmode-welcome.png)
+![item-form](wishtracker/src/assets/screenshot-item-form.png)
+![item-detail](wishtracker/src/assets/screenshot-item-detail.png)
+![dashboard](wishtracker/src/assets/screenshot-dashboard.png)
 ## Tech Stack & Dependencies
 
 ### Backend (wishtracker-backend)
@@ -77,7 +76,7 @@ cd wishtracker
 ```
 
 ### 2. Backend setup (Flask API)
-
+Backend: https://github.com/tsztin0217/wishtracker-backend
 ```bash
 cd wishtracker-backend
 python3 -m venv .venv
